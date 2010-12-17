@@ -88,11 +88,18 @@ def getFieldConfig(field_name, django_field, value = None):
     
     # foreignkeys or custom choices
     elif field_class_name in ['ForeignKey', 'ModelChoiceField', 'TypedChoiceField'] or getattr(ofield, 'choices', None):
-        config['xtype'] = 'combo' 
+        choices = form_field.choices
+        if ofield.widget.__class__.__name__ == 'CheckboxSelectMultiple':
+            config['xtype'] = 'checkboxgroup' 
+            config['columns'] = 1
+            config['items'] = []
+            for choice in choices:
+                config['items'].append({'boxLabel': choice[1], 'name': choice[0]})
+        else:
+            config['xtype'] = 'combo' 
         config['blankText'] = field_name + ' :' 
         # removes the standard '-----'
         form_field.empty_label = None
-        choices = form_field.choices
         #print field_class_name, form_field.choices
         #for i in form_field.choices:
          #   print i
